@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Citra · Image Studio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,700&family=Geist:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+<!-- ===================== HEADER ===================== -->
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="brand">
+      <div class="brand-mark">◐</div>
+      <div>
+        <h1 class="brand-name">Citra</h1>
+        <p class="brand-sub">Image Studio</p>
+      </div>
+    </div>
+    <nav class="meta">
+      <span class="meta-item mono" id="image-info">Belum ada gambar</span>
+    </nav>
+  </div>
+</header>
+
+<main class="layout">
+
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="side-section">
+      <button class="tool-btn active" data-tab="upload">
+        <span class="tool-name">Galeri</span>
+      </button>
+      <button class="tool-btn" data-tab="grayscale">
+        <span class="tool-name">Grayscale</span>
+      </button>
+      <button class="tool-btn" data-tab="binary">
+        <span class="tool-name">Citra Biner</span>
+      </button>
+      <button class="tool-btn" data-tab="arithmetic">
+        <span class="tool-name">Aritmatika</span>
+      </button>
+      <button class="tool-btn" data-tab="logical">
+        <span class="tool-name">Logika</span>
+      </button>
+      <button class="tool-btn" data-tab="convolution">
+        <span class="tool-name">Konvolusi</span>
+      </button>
+      <button class="tool-btn" data-tab="morphology">
+        <span class="tool-name">Morfologi</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===================== CONTENT ===================== -->
+  <section class="content">
+
+    <!-- ============= TAB: UPLOAD ============= -->
+    <div class="tab-panel active" data-panel="upload">
+      <div class="panel-head">
+        <h2>Galeri</h2>
+        <p>Unggah gambar utama. Tambahkan gambar kedua jika ingin mencoba operasi aritmatika atau logika antara dua citra.</p>
+      </div>
+
+      <div class="upload-grid">
+        <!-- Gambar Utama -->
+        <div class="upload-card">
+          <p class="upload-label">Gambar Utama</p>
+          <div class="dropzone" id="dropzone1">
+            <input type="file" id="file-input-1" accept=".png,.jpg,.jpeg,.bmp,.webp,.tiff,.tif,.gif" hidden>
+            <div class="dz-icon">↑</div>
+            <p class="dz-title">Klik atau seret gambar</p>
+            <p class="dz-hint">PNG · JPG · BMP · WEBP · TIFF · GIF · maks 16 MB</p>
+          </div>
+          <div class="upload-preview hidden" id="preview-card-1">
+            <img id="preview-img-1" alt="Gambar 1">
+            <div class="preview-meta mono" id="preview-meta-1"></div>
+            <div class="preview-actions">
+              <button class="btn-mini" data-hist-btn="preview-1">▼ Histogram</button>
+              <button class="btn-text" id="remove-1">Ganti gambar</button>
+            </div>
+            <div class="hist-panel hidden" id="hist-preview-1"></div>
+          </div>
+        </div>
+
+        <!-- Gambar Kedua -->
+        <div class="upload-card">
+          <p class="upload-label">Gambar Kedua <span class="opt">opsional</span></p>
+          <div class="dropzone" id="dropzone2">
+            <input type="file" id="file-input-2" accept=".png,.jpg,.jpeg,.bmp,.webp,.tiff,.tif,.gif" hidden>
+            <div class="dz-icon">↑</div>
+            <p class="dz-title">Klik atau seret gambar</p>
+            <p class="dz-hint">PNG · JPG · BMP · WEBP · TIFF · GIF · maks 16 MB</p>
+          </div>
+          <div class="upload-preview hidden" id="preview-card-2">
+            <img id="preview-img-2" alt="Gambar 2">
+            <div class="preview-meta mono" id="preview-meta-2"></div>
+            <div class="preview-actions">
+              <button class="btn-mini" data-hist-btn="preview-2">▼ Histogram</button>
+              <button class="btn-text" id="remove-2">Ganti gambar</button>
+            </div>
+            <div class="hist-panel hidden" id="hist-preview-2"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ============= TAB: GRAYSCALE ============= -->
+    <div class="tab-panel" data-panel="grayscale">
+      <div class="panel-head">
+        <h2>Grayscale</h2>
+        <p>Mengubah citra warna menjadi citra abu-abu menggunakan rumus luminositas
+          <span class="mono">Y = 0.299·R + 0.587·G + 0.114·B</span>.
+        </p>
+      </div>
+      <div class="action-bar">
+        <button class="btn-primary" data-action="grayscale">Jalankan</button>
+      </div>
+      <div class="compare" id="compare-grayscale"></div>
+    </div>
+
+    <!-- ============= TAB: BINARY ============= -->
+    <div class="tab-panel" data-panel="binary">
+      <div class="panel-head">
+        <h2>Citra Biner</h2>
+        <p>Thresholding untuk membuat citra hitam-putih.
+          <span class="mono">f(x,y) = 1 jika I(x,y) &gt; T, selain itu 0</span>.
+        </p>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group">
+          <label>Metode</label>
+          <div class="seg">
+            <button class="seg-btn active" data-bin-method="manual">Manual</button>
+            <button class="seg-btn" data-bin-method="otsu">Otsu (Otomatis)</button>
+          </div>
+        </div>
+        <div class="ctrl-group" id="threshold-group">
+          <label>Nilai Threshold (T) — <span class="mono" id="threshold-val">127</span></label>
+          <input type="range" id="threshold-slider" min="0" max="255" value="127">
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn-primary" data-action="binary">Jalankan</button>
+      </div>
+      <div class="compare" id="compare-binary"></div>
+    </div>
+
+    <!-- ============= TAB: ARITHMETIC ============= -->
+    <div class="tab-panel" data-panel="arithmetic">
+      <div class="panel-head">
+        <h2>Aritmatika</h2>
+        <p>Penjumlahan, pengurangan, perkalian, pembagian dengan konstanta atau gambar kedua.</p>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group">
+          <label>Mode</label>
+          <div class="seg">
+            <button class="seg-btn active" data-arith-mode="constant">+ Konstanta</button>
+            <button class="seg-btn" data-arith-mode="dual">+ Gambar 2</button>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <label>Operasi</label>
+          <div class="seg seg-4">
+            <button class="seg-btn active" data-arith-op="add">+ Tambah</button>
+            <button class="seg-btn" data-arith-op="subtract">− Kurang</button>
+            <button class="seg-btn" data-arith-op="multiply">× Kali</button>
+            <button class="seg-btn" data-arith-op="divide">÷ Bagi</button>
+          </div>
+        </div>
+        <div class="ctrl-group" id="arith-value-group">
+          <label>Nilai Konstanta — <span class="mono" id="arith-value-display">50</span></label>
+          <input type="range" id="arith-value" min="-255" max="255" value="50">
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn-primary" data-action="arithmetic">Jalankan</button>
+      </div>
+      <div class="compare" id="compare-arithmetic"></div>
+    </div>
+
+    <!-- ============= TAB: LOGICAL ============= -->
+    <div class="tab-panel" data-panel="logical">
+      <div class="panel-head">
+        <h2>Logika</h2>
+        <p>Operasi bitwise: AND, OR, XOR, NOT. Operasi NOT hanya membutuhkan satu gambar.</p>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group">
+          <label>Mode</label>
+          <div class="seg">
+            <button class="seg-btn active" data-logic-mode="constant">+ Konstanta</button>
+            <button class="seg-btn" data-logic-mode="dual">+ Gambar 2</button>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <label>Operasi</label>
+          <div class="seg seg-4">
+            <button class="seg-btn active" data-logic-op="and">AND</button>
+            <button class="seg-btn" data-logic-op="or">OR</button>
+            <button class="seg-btn" data-logic-op="xor">XOR</button>
+            <button class="seg-btn" data-logic-op="not">NOT</button>
+          </div>
+        </div>
+        <div class="ctrl-group" id="logic-value-group">
+          <label>Nilai Konstanta (0–255) — <span class="mono" id="logic-value-display">128</span></label>
+          <input type="range" id="logic-value" min="0" max="255" value="128">
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn-primary" data-action="logical">Jalankan</button>
+      </div>
+      <div class="compare" id="compare-logical"></div>
+    </div>
+
+    <!-- ============= TAB: CONVOLUTION ============= -->
+    <div class="tab-panel" data-panel="convolution">
+      <div class="panel-head">
+        <h2>Konvolusi &amp; Filter Spasial</h2>
+        <p>Aplikasikan kernel pada citra: mean filter, sharpening, dan edge detection (Sobel Vertikal, Sobel Horizontal, Prewitt).</p>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group">
+          <label>Pilih Filter</label>
+          <div class="filter-grid">
+            <button class="filter-card active" data-filter="mean">
+              <div class="filter-name">Mean Filter</div>
+              <div class="filter-desc">Blur · haluskan citra</div>
+            </button>
+            <button class="filter-card" data-filter="sharpen_standard">
+              <div class="filter-name">Sharpening Standar</div>
+              <div class="filter-desc">Penajaman ringan</div>
+            </button>
+            <button class="filter-card" data-filter="sharpen_strong">
+              <div class="filter-name">Sharpening Kuat</div>
+              <div class="filter-desc">Penajaman agresif</div>
+            </button>
+            <button class="filter-card" data-filter="sobel_vertical">
+              <div class="filter-name">Sobel Vertikal</div>
+              <div class="filter-desc">Deteksi tepi vertikal (Gx)</div>
+            </button>
+            <button class="filter-card" data-filter="sobel_horizontal">
+              <div class="filter-name">Sobel Horizontal</div>
+              <div class="filter-desc">Deteksi tepi horizontal (Gy)</div>
+            </button>
+            <button class="filter-card" data-filter="prewitt">
+              <div class="filter-name">Prewitt</div>
+              <div class="filter-desc">Edge detection alternatif</div>
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn-primary" data-action="convolution">Jalankan</button>
+      </div>
+      <div class="compare" id="compare-convolution"></div>
+      <div id="kernel-display" class="kernel-box hidden"></div>
+    </div>
+
+    <!-- ============= TAB: MORPHOLOGY ============= -->
+    <div class="tab-panel" data-panel="morphology">
+      <div class="panel-head">
+        <h2>Morfologi</h2>
+        <p>Operasi pada citra biner. Pilih operasi dan elemen penstruktur (SE), tersedia tujuh varian.</p>
+      </div>
+      <div class="controls">
+        <div class="ctrl-group">
+          <label>Operasi</label>
+          <div class="seg seg-4">
+            <button class="seg-btn active" data-morph-op="erosion">Erosi</button>
+            <button class="seg-btn" data-morph-op="dilation">Dilasi</button>
+            <button class="seg-btn" data-morph-op="opening">Opening</button>
+            <button class="seg-btn" data-morph-op="closing">Closing</button>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <label>Elemen Penstruktur (SE)</label>
+          <div class="se-grid" id="se-grid"></div>
+        </div>
+        <div class="ctrl-row">
+          <div class="ctrl-group">
+            <label>Threshold Biner — <span class="mono" id="morph-thresh-val">127</span></label>
+            <input type="range" id="morph-threshold" min="0" max="255" value="127">
+          </div>
+          <div class="ctrl-group">
+            <label>Iterasi — <span class="mono" id="morph-iter-val">1</span></label>
+            <input type="range" id="morph-iter" min="1" max="10" value="1">
+          </div>
+        </div>
+      </div>
+      <div class="action-bar">
+        <button class="btn-primary" data-action="morphology">Jalankan</button>
+      </div>
+      <div class="compare compare-3" id="compare-morphology"></div>
+    </div>
+
+  </section>
+</main>
+
+<!-- ===================== LIGHTBOX ===================== -->
+<div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="Pratinjau gambar">
+  <button class="lightbox-close" id="lightbox-close" aria-label="Tutup">✕</button>
+  <img id="lightbox-img" class="lightbox-img" alt="Pratinjau">
+</div>
+
+<!-- ===================== TOAST ===================== -->
+<div id="toast" class="toast"></div>
+
+<!-- ===================== LOADING OVERLAY ===================== -->
+<div id="loading" class="loading hidden">
+  <div class="spinner"></div>
+  <p class="mono">Memproses...</p>
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
